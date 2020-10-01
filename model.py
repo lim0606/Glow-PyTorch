@@ -108,7 +108,7 @@ class FlowStep(nn.Module):
             h = self.block(z1)
             shift, scale = split_feature(h, "cross")
             scale = torch.sigmoid(scale + 2.0)
-            z2 = z2 / scale
+            z2 = z2 / (scale+1e-6)
             z2 = z2 - shift
             logdet = -torch.sum(torch.log(scale), dim=[1, 2, 3]) + logdet
         z = torch.cat((z1, z2), dim=1)
