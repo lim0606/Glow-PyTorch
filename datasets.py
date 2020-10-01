@@ -101,3 +101,41 @@ def get_SVHN(augment, dataroot, download):
     )
 
     return image_shape, num_classes, train_dataset, test_dataset
+
+
+def get_MNIST(augment, dataroot, download):
+    image_shape = (32, 32, 1)
+    num_classes = 10
+
+    def add_noise(input, delta=0.1):
+        return input + torch.randn_like(input) * delta
+
+    # init
+    transformations = [transforms.Resize(32), transforms.ToTensor(), preprocess]
+    if augment:
+        transformations.extend([add_noise])
+    else:
+        pass
+
+    transform = transforms.Compose(transformations)
+
+    one_hot_encode = lambda target: F.one_hot(torch.tensor(target), num_classes)
+
+    path = Path(dataroot) / "data" / "MNIST"
+    train_dataset = datasets.MNIST(
+        path,
+        train=True, #split="train",
+        transform=transform,
+        target_transform=one_hot_encode,
+        download=download,
+    )
+
+    test_dataset = datasets.MNIST(
+        path,
+        train=False, #split="test",
+        transform=transform,
+        target_transform=one_hot_encode,
+        download=download,
+    )
+
+    return image_shape, num_classes, train_dataset, test_dataset
